@@ -1,0 +1,28 @@
+# Build outputs
+/traceping
+/tests/test_traceping
+*.o
+*.d
+
+# Local environment and Codex/agent state
+.env
+.env.*
+.codex/
+.agents/
+tests/
+
+# Generated measurement outputs
+*.csv
+*.tsv
+incident.md
+office-google.tsv
+mtr.csv
+
+# Generated presentation/demo artifacts
+presentation/
+
+# Project planning scratch documents
+SPEC.md
+REFACTORING_PLAN.md
+QUALITY_DIAGNOSIS_ALGORITHM.md
+COMMENT_GUIDELINES.md
