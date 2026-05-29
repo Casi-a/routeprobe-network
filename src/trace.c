@@ -17,15 +17,15 @@
 #include <unistd.h>
 
 /* 목적지 도달 또는 최대 hop 소진까지 설정된 TTL 순회를 수행한다. */
-int run_trace_mode(const TracePingConfig *config)
+int run_trace_mode(const RouteProbeConfig *config)
 {
-    TracePingRuntime runtime;
+    RouteProbeRuntime runtime;
     uint16_t ident = (uint16_t)(getpid() & 0xffff);
     bool reached = false;
     int rc;
 
     rc = runtime_open(config, write_trace_csv_header, &runtime);
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         return rc;
     }
 
@@ -67,7 +67,7 @@ int run_trace_mode(const TracePingConfig *config)
         if (runtime.csv != NULL && write_trace_csv_row(runtime.csv, config, &result) != 0) {
             fprintf(stderr, "failed to write CSV row\n");
             runtime_close(&runtime);
-            return TRACEPING_ERR_IO;
+            return ROUTEPROBE_ERR_IO;
         }
 
         if (result.destination_reached) {
@@ -83,5 +83,5 @@ int run_trace_mode(const TracePingConfig *config)
     }
 
     runtime_close(&runtime);
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }

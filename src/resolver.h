@@ -2,8 +2,8 @@
  * resolver.h
  * 숫자 IPv4 주소와 domain name을 IPv4 target으로 해석하는 인터페이스다.
  */
-#ifndef TRACEPING_RESOLVER_H
-#define TRACEPING_RESOLVER_H
+#ifndef ROUTEPROBE_RESOLVER_H
+#define ROUTEPROBE_RESOLVER_H
 
 #include "common.h"
 

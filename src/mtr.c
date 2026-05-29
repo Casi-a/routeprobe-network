@@ -80,7 +80,7 @@ void mtr_hop_stats_record(MtrHopStats *stats, const TraceResult *result)
 }
 
 /* 현재 hop에 TTL을 적용하고 probe 하나를 전송한 뒤 응답을 받는다. */
-static void probe_mtr_hop(const TracePingRuntime *runtime, const TracePingConfig *config, uint16_t ident, uint16_t seq, int hop, TraceResult *result)
+static void probe_mtr_hop(const RouteProbeRuntime *runtime, const RouteProbeConfig *config, uint16_t ident, uint16_t seq, int hop, TraceResult *result)
 {
     memset(result, 0, sizeof(*result));
     result->hop = hop;
@@ -99,7 +99,7 @@ static void probe_mtr_hop(const TracePingRuntime *runtime, const TracePingConfig
 }
 
 /* CSV가 요청된 경우 최종 hop 통계를 한 번에 기록한다. */
-static int write_mtr_csv(FILE *csv, const TracePingConfig *config, const MtrHopStats *stats, int count)
+static int write_mtr_csv(FILE *csv, const RouteProbeConfig *config, const MtrHopStats *stats, int count)
 {
     for (int i = 0; i < count; i++) {
         if (stats[i].sent == 0) {
@@ -113,16 +113,16 @@ static int write_mtr_csv(FILE *csv, const TracePingConfig *config, const MtrHopS
 }
 
 /* TTL sweep을 여러 cycle 반복하며 hop별 ICMP 무응답률과 RTT 분포를 출력한다. */
-int run_mtr_mode(const TracePingConfig *config)
+int run_mtr_mode(const RouteProbeConfig *config)
 {
-    TracePingRuntime runtime;
+    RouteProbeRuntime runtime;
     MtrHopStats *stats;
     uint16_t ident = (uint16_t)(getpid() & 0xffff);
     uint32_t seq = 1;
     int rc;
 
     rc = runtime_open(config, write_mtr_csv_header, &runtime);
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         return rc;
     }
 
@@ -130,7 +130,7 @@ int run_mtr_mode(const TracePingConfig *config)
     if (stats == NULL) {
         fprintf(stderr, "failed to allocate MTR stats buffer\n");
         runtime_close(&runtime);
-        return TRACEPING_ERR_GENERAL;
+        return ROUTEPROBE_ERR_GENERAL;
     }
     for (int hop = 1; hop <= config->max_hop; hop++) {
         mtr_hop_stats_init(&stats[hop - 1], hop);
@@ -171,12 +171,12 @@ int run_mtr_mode(const TracePingConfig *config)
         fprintf(stderr, "failed to write MTR CSV row\n");
         free(stats);
         runtime_close(&runtime);
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
 
     if (config->baseline_save_path != NULL) {
         rc = save_mtr_baseline(config->baseline_save_path, config, &runtime.resolved, stats, config->max_hop);
-        if (rc != TRACEPING_OK) {
+        if (rc != ROUTEPROBE_OK) {
             free(stats);
             runtime_close(&runtime);
             return rc;
@@ -184,7 +184,7 @@ int run_mtr_mode(const TracePingConfig *config)
     }
     if (config->baseline_compare_path != NULL) {
         rc = compare_mtr_baseline(config->baseline_compare_path, stats, config->max_hop);
-        if (rc != TRACEPING_OK) {
+        if (rc != ROUTEPROBE_OK) {
             free(stats);
             runtime_close(&runtime);
             return rc;
@@ -192,7 +192,7 @@ int run_mtr_mode(const TracePingConfig *config)
     }
     if (config->report_path != NULL) {
         rc = write_mtr_report(config->report_path, config, &runtime.resolved, stats, config->max_hop, config->baseline_compare_path);
-        if (rc != TRACEPING_OK) {
+        if (rc != ROUTEPROBE_OK) {
             free(stats);
             runtime_close(&runtime);
             return rc;
@@ -201,5 +201,5 @@ int run_mtr_mode(const TracePingConfig *config)
 
     free(stats);
     runtime_close(&runtime);
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }

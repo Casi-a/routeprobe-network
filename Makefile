@@ -1,5 +1,5 @@
 # Makefile
-# traceping 실행 파일과 테스트 바이너리를 빌드하고 검증 대상을 제공한다.
+# routeprobe 실행 파일과 테스트 바이너리를 빌드하고 검증 대상을 제공한다.
 
 CC ?= cc
 CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -O2 -g
@@ -7,8 +7,8 @@ CPPFLAGS ?= -D_POSIX_C_SOURCE=200809L -MMD -MP
 LDFLAGS ?=
 LDLIBS ?= -lm
 
-BIN := traceping
-TEST_BIN := tests/test_traceping
+BIN := routeprobe
+TEST_BIN := tests/test_routeprobe
 
 SRC := \
 	src/baseline.c \
@@ -27,7 +27,7 @@ SRC := \
 
 OBJ := $(SRC:.c=.o)
 MAIN_OBJ := src/main.o
-TEST_OBJ := tests/test_traceping.o
+TEST_OBJ := tests/test_routeprobe.o
 DEP := $(OBJ:.o=.d) $(MAIN_OBJ:.o=.d) $(TEST_OBJ:.o=.d)
 
 .PHONY: all test integration-test verify clean

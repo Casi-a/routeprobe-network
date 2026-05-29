@@ -112,7 +112,7 @@ void print_trace_result(const TraceResult *result)
 }
 
 /* MTR 모드의 대상 정보와 cycle 단위 진행 표시 줄을 출력한다. */
-void print_mtr_title(const TracePingConfig *config, const ResolvedTarget *resolved)
+void print_mtr_title(const RouteProbeConfig *config, const ResolvedTarget *resolved)
 {
     printf("MTR %s (%s): %d cycles, %d hops max\n", config->target, resolved->ip, config->count, config->max_hop);
     printf("Progress: ");

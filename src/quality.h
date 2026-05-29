@@ -2,8 +2,8 @@
  * quality.h
  * 계산된 Ping 통계를 기반으로 네트워크 품질 등급을 평가한다.
  */
-#ifndef TRACEPING_QUALITY_H
-#define TRACEPING_QUALITY_H
+#ifndef ROUTEPROBE_QUALITY_H
+#define ROUTEPROBE_QUALITY_H
 
 #include "common.h"
 

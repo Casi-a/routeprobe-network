@@ -3,26 +3,26 @@
  * CLI 파싱, probe, 출력, 테스트에서 함께 사용하는 상수, 종료 코드,
  * 설정값, 결과 자료구조를 정의한다.
  */
-#ifndef TRACEPING_COMMON_H
-#define TRACEPING_COMMON_H
+#ifndef ROUTEPROBE_COMMON_H
+#define ROUTEPROBE_COMMON_H
 
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <netinet/in.h>
 
-#define TRACEPING_VERSION "0.1.0"
-#define TRACEPING_MAX_ERROR 128
-#define TRACEPING_MAX_TARGET 256
+#define ROUTEPROBE_VERSION "0.1.0"
+#define ROUTEPROBE_MAX_ERROR 128
+#define ROUTEPROBE_MAX_TARGET 256
 
 typedef enum {
-    TRACEPING_OK = 0,
-    TRACEPING_ERR_GENERAL = 1,
-    TRACEPING_ERR_USAGE = 2,
-    TRACEPING_ERR_SOCKET = 3,
-    TRACEPING_ERR_DNS = 4,
-    TRACEPING_ERR_IO = 5
-} TracePingExitCode;
+    ROUTEPROBE_OK = 0,
+    ROUTEPROBE_ERR_GENERAL = 1,
+    ROUTEPROBE_ERR_USAGE = 2,
+    ROUTEPROBE_ERR_SOCKET = 3,
+    ROUTEPROBE_ERR_DNS = 4,
+    ROUTEPROBE_ERR_IO = 5
+} RouteProbeExitCode;
 
 typedef struct {
     const char *target;
@@ -41,7 +41,7 @@ typedef struct {
     bool graph_enabled;
     bool help;
     bool version;
-} TracePingConfig;
+} RouteProbeConfig;
 
 typedef enum {
     PING_STATUS_SUCCESS,
@@ -63,7 +63,7 @@ typedef struct {
     double rtt_ms;
     int ttl;
     PingStatus status;
-    char error[TRACEPING_MAX_ERROR];
+    char error[ROUTEPROBE_MAX_ERROR];
 } PingResult;
 
 typedef struct {
@@ -72,7 +72,7 @@ typedef struct {
     double rtt_ms;
     TraceStatus status;
     bool destination_reached;
-    char error[TRACEPING_MAX_ERROR];
+    char error[ROUTEPROBE_MAX_ERROR];
 } TraceResult;
 
 typedef struct {
@@ -103,7 +103,7 @@ typedef struct {
     bool has_rtt;
     bool has_jitter;
     TraceStatus status;
-    char error[TRACEPING_MAX_ERROR];
+    char error[ROUTEPROBE_MAX_ERROR];
     double total_ms;
     double previous_ms;
     bool has_previous_ms;

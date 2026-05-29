@@ -26,7 +26,7 @@ int resolve_target_ipv4(const char *target, ResolvedTarget *resolved, char *erro
     rc = getaddrinfo(target, NULL, &hints, &result);
     if (rc != 0) {
         snprintf(error, error_size, "failed to resolve %s: %s", target, gai_strerror(rc));
-        return TRACEPING_ERR_DNS;
+        return ROUTEPROBE_ERR_DNS;
     }
 
     // 첫 addrinfo가 항상 사용 가능하다고 가정하지 않고 방어적으로 순회한다.
@@ -40,14 +40,14 @@ int resolve_target_ipv4(const char *target, ResolvedTarget *resolved, char *erro
         if (inet_ntop(AF_INET, &resolved->addr.sin_addr, resolved->ip, sizeof(resolved->ip)) == NULL) {
             snprintf(error, error_size, "failed to format resolved IPv4 address");
             freeaddrinfo(result);
-            return TRACEPING_ERR_DNS;
+            return ROUTEPROBE_ERR_DNS;
         }
 
         freeaddrinfo(result);
-        return TRACEPING_OK;
+        return ROUTEPROBE_OK;
     }
 
     snprintf(error, error_size, "failed to resolve %s: no IPv4 address found", target);
     freeaddrinfo(result);
-    return TRACEPING_ERR_DNS;
+    return ROUTEPROBE_ERR_DNS;
 }

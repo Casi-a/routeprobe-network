@@ -13,22 +13,22 @@
 /* 검증된 설정을 선택된 실행 모드로 전달한다. */
 int main(int argc, char **argv)
 {
-    TracePingConfig config;
-    char error[TRACEPING_MAX_ERROR] = "";
+    RouteProbeConfig config;
+    char error[ROUTEPROBE_MAX_ERROR] = "";
     int rc = parse_cli(argc, argv, &config, error, sizeof(error));
 
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         fprintf(stderr, "error: %s\n\n", error);
         print_usage(argv[0]);
         return rc;
     }
     if (config.help) {
         print_usage(argv[0]);
-        return TRACEPING_OK;
+        return ROUTEPROBE_OK;
     }
     if (config.version) {
         print_version();
-        return TRACEPING_OK;
+        return ROUTEPROBE_OK;
     }
 
     if (config.trace) {

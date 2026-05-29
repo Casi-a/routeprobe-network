@@ -14,7 +14,7 @@
 #include <unistd.h>
 
 /* runtime_close가 기대하는 sentinel 값으로 runtime 자원을 초기화한다. */
-void runtime_init_empty(TracePingRuntime *runtime)
+void runtime_init_empty(RouteProbeRuntime *runtime)
 {
     // 일부 자원만 열린 runtime도 항상 runtime_close에 넘길 수 있어야 한다.
     runtime->sockfd = -1;
@@ -22,15 +22,15 @@ void runtime_init_empty(TracePingRuntime *runtime)
 }
 
 /* 모드가 probe를 보내기 전에 필요한 모든 자원을 준비한다. */
-int runtime_open(const TracePingConfig *config, CsvHeaderWriter write_header, TracePingRuntime *runtime)
+int runtime_open(const RouteProbeConfig *config, CsvHeaderWriter write_header, RouteProbeRuntime *runtime)
 {
-    char error[TRACEPING_MAX_ERROR] = "";
+    char error[ROUTEPROBE_MAX_ERROR] = "";
     int rc;
 
     runtime_init_empty(runtime);
 
     rc = resolve_target_ipv4(config->target, &runtime->resolved, error, sizeof(error));
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         fprintf(stderr, "%s\n", error);
         return rc;
     }
@@ -39,7 +39,7 @@ int runtime_open(const TracePingConfig *config, CsvHeaderWriter write_header, Tr
     if (runtime->sockfd < 0) {
         fprintf(stderr, "%s\n", error);
         runtime_close(runtime);
-        return TRACEPING_ERR_SOCKET;
+        return ROUTEPROBE_ERR_SOCKET;
     }
 
     if (config->output_path != NULL) {
@@ -47,20 +47,20 @@ int runtime_open(const TracePingConfig *config, CsvHeaderWriter write_header, Tr
         if (runtime->csv == NULL) {
             fprintf(stderr, "failed to open %s: %s\n", config->output_path, strerror(errno));
             runtime_close(runtime);
-            return TRACEPING_ERR_IO;
+            return ROUTEPROBE_ERR_IO;
         }
         if (write_header(runtime->csv) != 0) {
             fprintf(stderr, "failed to write CSV header\n");
             runtime_close(runtime);
-            return TRACEPING_ERR_IO;
+            return ROUTEPROBE_ERR_IO;
         }
     }
 
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }
 
 /* CSV와 소켓 자원이 열려 있으면 해제한다. */
-void runtime_close(TracePingRuntime *runtime)
+void runtime_close(RouteProbeRuntime *runtime)
 {
     if (runtime->csv != NULL) {
         fclose(runtime->csv);

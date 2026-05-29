@@ -2,8 +2,8 @@
  * stats.h
  * Ping 결과 배열에서 packet loss와 RTT 기반 통계를 계산하는 인터페이스다.
  */
-#ifndef TRACEPING_STATS_H
-#define TRACEPING_STATS_H
+#ifndef ROUTEPROBE_STATS_H
+#define ROUTEPROBE_STATS_H
 
 #include "common.h"
 

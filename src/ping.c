@@ -18,15 +18,15 @@
 #include <unistd.h>
 
 /* 해석된 IPv4 대상 하나에 대해 설정된 Ping 흐름을 수행한다. */
-int run_ping_mode(const TracePingConfig *config)
+int run_ping_mode(const RouteProbeConfig *config)
 {
     PingResult *results;
-    TracePingRuntime runtime;
+    RouteProbeRuntime runtime;
     uint16_t ident = (uint16_t)(getpid() & 0xffff);
     int rc;
 
     rc = runtime_open(config, write_ping_csv_header, &runtime);
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         return rc;
     }
 
@@ -34,7 +34,7 @@ int run_ping_mode(const TracePingConfig *config)
     if (results == NULL) {
         fprintf(stderr, "failed to allocate ping result buffer\n");
         runtime_close(&runtime);
-        return TRACEPING_ERR_GENERAL;
+        return ROUTEPROBE_ERR_GENERAL;
     }
 
     printf("PING %s (%s): %d packets\n", config->target, runtime.resolved.ip, config->count);
@@ -53,7 +53,7 @@ int run_ping_mode(const TracePingConfig *config)
             fprintf(stderr, "failed to write CSV row\n");
             free(results);
             runtime_close(&runtime);
-            return TRACEPING_ERR_IO;
+            return ROUTEPROBE_ERR_IO;
         }
 
         if (i + 1 < config->count) {
@@ -68,5 +68,5 @@ int run_ping_mode(const TracePingConfig *config)
 
     free(results);
     runtime_close(&runtime);
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }

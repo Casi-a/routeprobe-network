@@ -81,7 +81,7 @@ int write_ping_csv_header(FILE *fp)
 }
 
 /* 성공 응답이 없으면 RTT/TTL을 비워 두고 Ping CSV 행 하나를 출력한다. */
-int write_ping_csv_row(FILE *fp, const TracePingConfig *config, const PingResult *result)
+int write_ping_csv_row(FILE *fp, const RouteProbeConfig *config, const PingResult *result)
 {
     char timestamp[64] = "";
     format_timestamp(timestamp, sizeof(timestamp));
@@ -115,7 +115,7 @@ int write_trace_csv_header(FILE *fp)
 }
 
 /* 타임아웃/오류 행에서는 RTT를 비워 두고 Trace CSV 행 하나를 출력한다. */
-int write_trace_csv_row(FILE *fp, const TracePingConfig *config, const TraceResult *result)
+int write_trace_csv_row(FILE *fp, const RouteProbeConfig *config, const TraceResult *result)
 {
     char timestamp[64] = "";
     format_timestamp(timestamp, sizeof(timestamp));
@@ -145,7 +145,7 @@ int write_mtr_csv_header(FILE *fp)
 }
 
 /* RTT가 없는 hop은 RTT 계열 값을 비워 두고 MTR 누적 통계 행 하나를 출력한다. */
-int write_mtr_csv_row(FILE *fp, const TracePingConfig *config, const MtrHopStats *stats)
+int write_mtr_csv_row(FILE *fp, const RouteProbeConfig *config, const MtrHopStats *stats)
 {
     char timestamp[64] = "";
     format_timestamp(timestamp, sizeof(timestamp));

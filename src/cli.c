@@ -1,6 +1,6 @@
 /*
  * cli.c
- * 명령행 옵션을 TracePingConfig로 변환하고 사용법/버전 출력을 만든다.
+ * 명령행 옵션을 RouteProbeConfig로 변환하고 사용법/버전 출력을 만든다.
  */
 #include "cli.h"
 
@@ -31,13 +31,13 @@ typedef struct {
 } OptionSpec;
 
 #define BOOL_OPTION(long_name_, short_name_, field_, description_, exits_early_) \
-    {long_name_, short_name_, NULL, description_, OPTION_BOOL, offsetof(TracePingConfig, field_), 0, 0, 0, exits_early_}
+    {long_name_, short_name_, NULL, description_, OPTION_BOOL, offsetof(RouteProbeConfig, field_), 0, 0, 0, exits_early_}
 
 #define INT_OPTION(long_name_, short_name_, value_name_, field_, description_, default_, min_, max_) \
-    {long_name_, short_name_, value_name_, description_, OPTION_INT, offsetof(TracePingConfig, field_), min_, max_, default_, false}
+    {long_name_, short_name_, value_name_, description_, OPTION_INT, offsetof(RouteProbeConfig, field_), min_, max_, default_, false}
 
 #define STRING_OPTION(long_name_, short_name_, value_name_, field_, description_) \
-    {long_name_, short_name_, value_name_, description_, OPTION_STRING, offsetof(TracePingConfig, field_), 0, 0, 0, false}
+    {long_name_, short_name_, value_name_, description_, OPTION_STRING, offsetof(RouteProbeConfig, field_), 0, 0, 0, false}
 
 static const OptionSpec OPTIONS[] = {
     // 파싱과 도움말 출력이 같은 표를 보게 해서 별칭 불일치를 막는다.
@@ -59,7 +59,7 @@ static const OptionSpec OPTIONS[] = {
 };
 
 /* 명령행 override를 적용하기 전에 내장 기본값을 채운다. */
-void config_init_defaults(TracePingConfig *config)
+void config_init_defaults(RouteProbeConfig *config)
 {
     memset(config, 0, sizeof(*config));
     config->count = 4;
@@ -89,11 +89,11 @@ static int require_value(int argc, char **argv, int *index, const char *option, 
 {
     if (*index + 1 >= argc) {
         snprintf(error, error_size, "%s requires a value", option);
-        return TRACEPING_ERR_USAGE;
+        return ROUTEPROBE_ERR_USAGE;
     }
     *index += 1;
     *value = argv[*index];
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }
 
 /* 긴 옵션 이름 또는 모호하지 않은 짧은 별칭과 일치하는지 확인한다. */
@@ -115,8 +115,8 @@ static const OptionSpec *find_option(const char *arg)
     return NULL;
 }
 
-/* 값 검증을 포함해 옵션 하나를 TracePingConfig에 반영한다. */
-static int apply_option(const OptionSpec *option, int argc, char **argv, int *index, TracePingConfig *config, char *error, size_t error_size)
+/* 값 검증을 포함해 옵션 하나를 RouteProbeConfig에 반영한다. */
+static int apply_option(const OptionSpec *option, int argc, char **argv, int *index, RouteProbeConfig *config, char *error, size_t error_size)
 {
     char *base = (char *)config;
     const char *value = NULL;
@@ -124,32 +124,32 @@ static int apply_option(const OptionSpec *option, int argc, char **argv, int *in
     if (option->type == OPTION_BOOL) {
         bool *field = (bool *)(base + option->offset);
         *field = true;
-        return TRACEPING_OK;
+        return ROUTEPROBE_OK;
     }
 
     int rc = require_value(argc, argv, index, option->long_name, &value, error, error_size);
-    if (rc != TRACEPING_OK) {
+    if (rc != ROUTEPROBE_OK) {
         return rc;
     }
 
     if (option->type == OPTION_STRING) {
         const char **field = (const char **)(base + option->offset);
         *field = value;
-        return TRACEPING_OK;
+        return ROUTEPROBE_OK;
     }
 
     int parsed;
     if (!parse_int_range(value, option->min, option->max, &parsed)) {
         snprintf(error, error_size, "%s must be an integer in range %d..%d", option->long_name, option->min, option->max);
-        return TRACEPING_ERR_USAGE;
+        return ROUTEPROBE_ERR_USAGE;
     }
     int *field = (int *)(base + option->offset);
     *field = parsed;
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }
 
 /* argv를 설정으로 변환하며 도움말/버전 요청은 대상 검증 전에 종료한다. */
-int parse_cli(int argc, char **argv, TracePingConfig *config, char *error, size_t error_size)
+int parse_cli(int argc, char **argv, RouteProbeConfig *config, char *error, size_t error_size)
 {
     config_init_defaults(config);
 
@@ -159,39 +159,39 @@ int parse_cli(int argc, char **argv, TracePingConfig *config, char *error, size_
 
         if (option != NULL) {
             int rc = apply_option(option, argc, argv, &i, config, error, error_size);
-            if (rc != TRACEPING_OK) {
+            if (rc != ROUTEPROBE_OK) {
                 return rc;
             }
             if (option->exits_early) {
-                return TRACEPING_OK;
+                return ROUTEPROBE_OK;
             }
             continue;
         }
 
         if (strncmp(arg, "--", 2) == 0) {
             snprintf(error, error_size, "unknown option: %s", arg);
-            return TRACEPING_ERR_USAGE;
+            return ROUTEPROBE_ERR_USAGE;
         }
         if (config->target != NULL) {
             snprintf(error, error_size, "multiple targets specified");
-            return TRACEPING_ERR_USAGE;
+            return ROUTEPROBE_ERR_USAGE;
         }
         config->target = arg;
     }
 
     if (config->target == NULL) {
         snprintf(error, error_size, "target is required");
-        return TRACEPING_ERR_USAGE;
+        return ROUTEPROBE_ERR_USAGE;
     }
     if (config->trace && config->mtr) {
         snprintf(error, error_size, "--trace and --mtr cannot be used together");
-        return TRACEPING_ERR_USAGE;
+        return ROUTEPROBE_ERR_USAGE;
     }
     if (!config->mtr && (config->baseline_save_path != NULL || config->baseline_compare_path != NULL || config->report_path != NULL)) {
         snprintf(error, error_size, "baseline and report options require --mtr");
-        return TRACEPING_ERR_USAGE;
+        return ROUTEPROBE_ERR_USAGE;
     }
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }
 
 /* 별칭과 기본값이 어긋나지 않도록 옵션 표에서 사용법 줄을 출력한다. */
@@ -222,5 +222,5 @@ void print_usage(const char *program)
 /* --version과 --v에서 사용하는 프로그램 버전을 출력한다. */
 void print_version(void)
 {
-    printf("traceping %s\n", TRACEPING_VERSION);
+    printf("routeprobe %s\n", ROUTEPROBE_VERSION);
 }

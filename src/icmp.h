@@ -2,8 +2,8 @@
  * icmp.h
  * raw ICMP 소켓, 패킷 생성, checksum, 응답 수신 API를 제공한다.
  */
-#ifndef TRACEPING_ICMP_H
-#define TRACEPING_ICMP_H
+#ifndef ROUTEPROBE_ICMP_H
+#define ROUTEPROBE_ICMP_H
 
 #include "common.h"
 

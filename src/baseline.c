@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define BASELINE_MAGIC "traceping-baseline-v1"
+#define BASELINE_MAGIC "routeprobe-baseline-v1"
 #define NO_REPLY_REGRESSION_THRESHOLD 5.0
 #define AVG_REGRESSION_THRESHOLD_MS 20.0
 #define BASELINE_HOP_HEADER_V1 "hop\tremote_ip\tsent\treceived\tloss_percent\tlast_ms\tavg_ms\tbest_ms\tworst_ms\tjitter_ms\tstatus"
@@ -101,11 +101,11 @@ static void strip_newline(char *line)
 /* hop index가 파일/배열 경계 안에 있는지 확인한다. */
 static bool valid_hop(int hop)
 {
-    return hop >= 1 && hop <= TRACEPING_BASELINE_MAX_HOPS;
+    return hop >= 1 && hop <= ROUTEPROBE_BASELINE_MAX_HOPS;
 }
 
 /* 기준선 stream header와 hop 행을 순서대로 기록한다. */
-int write_mtr_baseline_stream(FILE *fp, const TracePingConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count)
+int write_mtr_baseline_stream(FILE *fp, const RouteProbeConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count)
 {
     char timestamp[64] = "";
 
@@ -158,7 +158,7 @@ static int parse_metadata_line(char *line, MtrBaseline *baseline)
         snprintf(baseline->captured_at, sizeof(baseline->captured_at), "%s", value);
     } else if (strcmp(key, "hop_count") == 0) {
         baseline->hop_count = atoi(value);
-        if (baseline->hop_count < 0 || baseline->hop_count > TRACEPING_BASELINE_MAX_HOPS) {
+        if (baseline->hop_count < 0 || baseline->hop_count > ROUTEPROBE_BASELINE_MAX_HOPS) {
             return -1;
         }
     }
@@ -526,21 +526,21 @@ int print_mtr_baseline_comparison(FILE *fp, const MtrBaseline *baseline, const M
 }
 
 /* MTR 기준선 파일을 저장한다. */
-int save_mtr_baseline(const char *path, const TracePingConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count)
+int save_mtr_baseline(const char *path, const RouteProbeConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count)
 {
     FILE *fp = fopen(path, "w");
     if (fp == NULL) {
         fprintf(stderr, "failed to open baseline file %s: %s\n", path, strerror(errno));
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
     if (write_mtr_baseline_stream(fp, config, resolved, stats, count) != 0) {
         fprintf(stderr, "failed to write baseline file %s\n", path);
         fclose(fp);
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
     fclose(fp);
     printf("\n기준선 저장 완료: %s\n", path);
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }
 
 /* MTR 기준선 파일을 읽고 현재 측정값과 비교 결과를 출력한다. */
@@ -550,16 +550,16 @@ int compare_mtr_baseline(const char *path, const MtrHopStats *current, int curre
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
         fprintf(stderr, "failed to open baseline file %s: %s\n", path, strerror(errno));
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
     if (read_mtr_baseline_stream(fp, &baseline) != 0) {
         fprintf(stderr, "failed to read baseline file %s\n", path);
         fclose(fp);
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
     fclose(fp);
     putchar('\n');
-    return print_mtr_baseline_comparison(stdout, &baseline, current, current_count) == 0 ? TRACEPING_OK : TRACEPING_ERR_IO;
+    return print_mtr_baseline_comparison(stdout, &baseline, current, current_count) == 0 ? ROUTEPROBE_OK : ROUTEPROBE_ERR_IO;
 }
 
 /* Markdown 표에 MTR hop 통계 전체를 기록한다. */
@@ -593,7 +593,7 @@ static int write_report_mtr_table(FILE *fp, const MtrHopStats *stats, int count)
 }
 
 /* 현재 MTR 측정값과 선택적 기준선 비교를 Markdown 리포트로 저장한다. */
-int write_mtr_report(const char *path, const TracePingConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count, const char *baseline_path)
+int write_mtr_report(const char *path, const RouteProbeConfig *config, const ResolvedTarget *resolved, const MtrHopStats *stats, int count, const char *baseline_path)
 {
     char timestamp[64] = "";
     MtrBaseline baseline;
@@ -603,7 +603,7 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
     FILE *fp = fopen(path, "w");
     if (fp == NULL) {
         fprintf(stderr, "failed to open report file %s: %s\n", path, strerror(errno));
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
 
     if (baseline_path != NULL) {
@@ -620,7 +620,7 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
     }
 
     format_timestamp(timestamp, sizeof(timestamp));
-    fprintf(fp, "# TracePing 장애 분석 리포트\n\n");
+    fprintf(fp, "# RouteProbe 장애 분석 리포트\n\n");
     fprintf(fp, "- 생성 시각: `%s`\n", timestamp);
     fprintf(fp, "- 대상: `%s`\n", config->target);
     fprintf(fp, "- 해석된 IP: `%s`\n", resolved->ip);
@@ -633,7 +633,7 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
     MtrQualityDiagnosis diagnosis = evaluate_mtr_quality(loaded_baseline, stats, count);
     if (print_quality_diagnosis_body(fp, &diagnosis) != 0) {
         fclose(fp);
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
 
     if (baseline_path != NULL) {
@@ -649,7 +649,7 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
             fprintf(fp, "\n변경 사항:\n");
             if (print_baseline_change_list(fp, loaded_baseline, stats, count, &changes) != 0) {
                 fclose(fp);
-                return TRACEPING_ERR_IO;
+                return ROUTEPROBE_ERR_IO;
             }
 
             fprintf(fp, "\n해석:\n");
@@ -672,7 +672,7 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
         fprintf(fp, "- 기준선 생성 시각: `%s`\n\n", loaded_baseline->captured_at[0] ? loaded_baseline->captured_at : "알 수 없음");
         if (write_report_mtr_table(fp, loaded_baseline->hops, loaded_baseline->hop_count) != 0) {
             fclose(fp);
-            return TRACEPING_ERR_IO;
+            return ROUTEPROBE_ERR_IO;
         }
         fprintf(fp, "\n");
     }
@@ -680,12 +680,12 @@ int write_mtr_report(const char *path, const TracePingConfig *config, const Reso
     fprintf(fp, "### 현재 MTR\n\n");
     if (write_report_mtr_table(fp, stats, count) != 0) {
         fclose(fp);
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
 
     if (fclose(fp) != 0) {
-        return TRACEPING_ERR_IO;
+        return ROUTEPROBE_ERR_IO;
     }
     printf("\n리포트 저장 완료: %s\n", path);
-    return TRACEPING_OK;
+    return ROUTEPROBE_OK;
 }

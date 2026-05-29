@@ -2,8 +2,8 @@
  * timeutil.h
  * monotonic 시간 계산, millisecond sleep, local timestamp formatting helper다.
  */
-#ifndef TRACEPING_TIMEUTIL_H
-#define TRACEPING_TIMEUTIL_H
+#ifndef ROUTEPROBE_TIMEUTIL_H
+#define ROUTEPROBE_TIMEUTIL_H
 
 #include <stddef.h>
 #include <time.h>

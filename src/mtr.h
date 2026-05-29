@@ -2,8 +2,8 @@
  * mtr.h
  * hop별 품질 통계를 누적하는 MTR 스타일 모드의 공개 인터페이스를 제공한다.
  */
-#ifndef TRACEPING_MTR_H
-#define TRACEPING_MTR_H
+#ifndef ROUTEPROBE_MTR_H
+#define ROUTEPROBE_MTR_H
 
 #include "common.h"
 
@@ -14,6 +14,6 @@ void mtr_hop_stats_init(MtrHopStats *stats, int hop);
 void mtr_hop_stats_record(MtrHopStats *stats, const TraceResult *result);
 
 /* TTL sweep을 여러 cycle 반복하며 hop별 ICMP 무응답률과 RTT 분포를 출력한다. */
-int run_mtr_mode(const TracePingConfig *config);
+int run_mtr_mode(const RouteProbeConfig *config);
 
 #endif

@@ -2,8 +2,8 @@
  * terminal_output.h
  * Ping 결과, Trace row, 통계, 품질, 선택적 RTT graph의 terminal 출력을 담당한다.
  */
-#ifndef TRACEPING_TERMINAL_OUTPUT_H
-#define TRACEPING_TERMINAL_OUTPUT_H
+#ifndef ROUTEPROBE_TERMINAL_OUTPUT_H
+#define ROUTEPROBE_TERMINAL_OUTPUT_H
 
 #include "common.h"
 #include "quality.h"
@@ -24,7 +24,7 @@ void print_quality(const PingStats *stats, QualityLevel quality);
 void print_trace_result(const TraceResult *result);
 
 /* MTR 실행 시작 정보와 진행 표시 줄을 출력한다. */
-void print_mtr_title(const TracePingConfig *config, const ResolvedTarget *resolved);
+void print_mtr_title(const RouteProbeConfig *config, const ResolvedTarget *resolved);
 
 /* MTR cycle 하나가 끝날 때마다 진행 네모를 출력한다. */
 void print_mtr_progress_tick(void);

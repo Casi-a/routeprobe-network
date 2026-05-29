@@ -363,5 +363,5 @@ int receive_icmp_response(int sockfd, uint16_t ident, uint16_t seq, int timeout_
     if (trace != NULL) {
         return receive_trace_response(sockfd, ident, seq, timeout_ms, trace);
     }
-    return TRACEPING_ERR_GENERAL;
+    return ROUTEPROBE_ERR_GENERAL;
 }

@@ -1,6 +1,6 @@
-# TracePing
+# RouteProbe
 
-`traceping`은 C로 만든 Linux용 네트워크 진단 CLI이다. Ping, Trace, MTR 스타일 측정을 지원하고, 정상 기준선과 현재 상태를 비교해 한국어 Markdown 리포트를 생성한다.
+`routeprobe`는 C로 만든 Linux용 네트워크 진단 CLI이다. Ping, Trace, MTR 스타일 측정을 지원하고, 정상 기준선과 현재 상태를 비교해 한국어 Markdown 리포트를 생성한다.
 
 ## 핵심 기능
 
@@ -21,7 +21,7 @@ make
 raw ICMP 소켓을 사용하므로 실행에는 보통 `sudo` 또는 `CAP_NET_RAW` 권한이 필요하다.
 
 ```sh
-sudo ./traceping 8.8.8.8
+sudo ./routeprobe 8.8.8.8
 ```
 
 ## 사용 예시
@@ -29,46 +29,46 @@ sudo ./traceping 8.8.8.8
 기본 Ping:
 
 ```sh
-sudo ./traceping 8.8.8.8
-sudo ./traceping google.com --c 10 --i 500 --to 1500
+sudo ./routeprobe 8.8.8.8
+sudo ./routeprobe google.com --c 10 --i 500 --to 1500
 ```
 
 Ping RTT 그래프:
 
 ```sh
-sudo ./traceping 8.8.8.8 --graph
+sudo ./routeprobe 8.8.8.8 --graph
 ```
 
 Trace:
 
 ```sh
-sudo ./traceping google.com --trace
-sudo ./traceping google.com --tr --mh 20 --st
+sudo ./routeprobe google.com --trace
+sudo ./routeprobe google.com --tr --mh 20 --st
 ```
 
 MTR:
 
 ```sh
-sudo ./traceping google.com --mtr --count 10
-sudo ./traceping google.com --mt --c 10 --mh 30
+sudo ./routeprobe google.com --mtr --count 10
+sudo ./routeprobe google.com --mt --c 10 --mh 30
 ```
 
 CSV 저장:
 
 ```sh
-sudo ./traceping google.com --mt --c 10 --output mtr.csv
+sudo ./routeprobe google.com --mt --c 10 --output mtr.csv
 ```
 
 기준선 저장:
 
 ```sh
-sudo ./traceping google.com --mt --c 10 --baseline-save office-google.tsv
+sudo ./routeprobe google.com --mt --c 10 --baseline-save office-google.tsv
 ```
 
 기준선 비교 및 리포트 생성:
 
 ```sh
-sudo ./traceping google.com --mt --c 10 \
+sudo ./routeprobe google.com --mt --c 10 \
   --baseline-compare office-google.tsv \
   --report incident.md
 ```
@@ -77,7 +77,7 @@ sudo ./traceping google.com --mt --c 10 \
 
 MTR 모드는 hop별 ICMP 무응답률과 RTT를 보여주지만, 중간 hop의 ICMP 무응답을 바로 packet loss로 단정하지 않는다. 라우터 정책, 필터링, rate limit 때문에 중간 hop이 응답하지 않을 수 있기 때문이다.
 
-TracePing의 리포트는 다음을 우선해서 진단한다.
+RouteProbe의 리포트는 다음을 우선해서 진단한다.
 
 1. 목적지에 도달했는가
 2. 목적지 ICMP 무응답률이 낮은가

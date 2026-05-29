@@ -1,6 +1,6 @@
 # Build outputs
-/traceping
-/tests/test_traceping
+/routeprobe
+/tests/test_routeprobe
 *.o
 *.d
 
